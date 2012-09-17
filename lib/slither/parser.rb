@@ -16,7 +16,7 @@ class Slither
         next if line.empty?
         @definition.sections.each do |section|
           if section.match(line)
-            validate_length(line, section)
+            validate_length(line, section) if @definition.options[:validate_length]
             parsed = fill_content(line, section, parsed)
           end
         end

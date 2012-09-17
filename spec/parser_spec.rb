@@ -72,6 +72,27 @@ describe Slither::Parser do
       lambda { @parser.parse }.should raise_error(Slither::LineWrongSizeError)
     end
     
+    it "shouldn't raise an error if validate is turned off and too short" do
+      @definition.options[:validate_length] = false
+      @definition.sections[0].optional = true
+      @definition.sections[2].optional = true
+      @io.string = "abcdefghijk\nabc"
+      
+      expected = { :body => [ {:first => "abcdefghij", :last => "k" },
+        {:first => "abc", :last => "" } ] }
+      @parser.parse.should == expected
+    end
+    
+    it "shouldn't raise an error if validate is turned off and too long" do
+      @definition.options[:validate_length] = false
+      @definition.sections[0].optional = true
+      @definition.sections[2].optional = true
+      @io.string = 'abcdefghijklmnopqrstuvwxyz'
+      
+      expected = { :body => [ {:first => "abcdefghij", :last => "klmnopqrst" } ] }
+      @parser.parse.should == expected
+    end
+    
   end
   
   describe "when parsing by bytes" do
