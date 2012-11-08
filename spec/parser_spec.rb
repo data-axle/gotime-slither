@@ -218,6 +218,26 @@ describe Slither::Parser do
       @parser.send(:newline?,nil).should eq(false)
       @parser.send(:newline?,"").should eq(false)
     end
+  end
+  
+  describe "when using error handler" do
+    
+    it "calls the error_handler lambda" do
+      error_handler = lambda {|line| raise "error handler exception for #{line}"}
+      
+      @definition = Slither.define :test, error_handler: error_handler do |d|
+        d.body do |b|
+          b.trap { true }
+          b.column :first, 5
+          b.column :last, 5
+        end   
+      end
+      
+      @io = StringIO.new 'abc'
+      @parser = Slither::Parser.new(@definition, @io)
+      
+      lambda { @parser.parse(error_handler) }.should raise_error(RuntimeError, "error handler exception for abc")
+    end
     
   end
 end

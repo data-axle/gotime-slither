@@ -8,7 +8,7 @@ class Slither
       @mode = :linear
     end
     
-    def parse()
+    def parse(error_handler=nil)
       parsed = {}
 
       @file.each_line do |line|
@@ -16,7 +16,7 @@ class Slither
         next if line.empty?
         @definition.sections.each do |section|
           if section.match(line)
-            validate_length(line, section) if @definition.options[:validate_length]
+            validate_length(line, section, error_handler) if @definition.options[:validate_length]
             parsed = fill_content(line, section, parsed)
           end
         end
@@ -66,10 +66,14 @@ class Slither
         parsed
       end
       
-      def validate_length(line, section)
+      def validate_length(line, section, error_handler)
         if line.length != section.length
-          parsed_line = parse_for_error_message(line)
-          raise Slither::LineWrongSizeError, "Line wrong size: (#{line.length} when it should be #{section.length}. #{parsed_line})" 
+          if error_handler
+            error_handler.call(line)
+          else
+            parsed_line = parse_for_error_message(line)
+            raise Slither::LineWrongSizeError, "Line wrong size: (#{line.length} when it should be #{section.length}. #{parsed_line})" 
+          end
         end
       end
       

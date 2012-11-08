@@ -42,7 +42,7 @@ class Slither
     definition = definition(definition_name)
     raise ArgumentError, "Definition name '#{definition_name}' was not found." unless definition
     parser = Parser.new(definition, io)
-    definition.options[:by_bytes] ? parser.parse_by_bytes : parser.parse
+    definition.options[:by_bytes] ? parser.parse_by_bytes : parser.parse(definition.options[:error_handler])
   end
   
   private
