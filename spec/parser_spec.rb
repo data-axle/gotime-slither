@@ -93,6 +93,23 @@ describe Slither::Parser do
       @parser.parse.should == expected
     end
     
+    it 'should handle utf characters with force_character_offset = true' do
+      @definition.sections[0].optional = true
+      @definition.sections[2].optional = true
+      @definition.options[:force_character_offset] = true
+      utf_str1 = "12\xE5\x9B\xBD4567890".force_encoding('utf-8')
+      utf_str2 = "ab\xE5\x9B\xBDdefghij".force_encoding('utf-8')
+      @io.string = (utf_str1 + utf_str2)
+      
+      (utf_str1 + utf_str2).size.should eq(20)
+
+      expected = {
+        :body => [ {:first => utf_str1, :last => utf_str2} ]
+      }
+      
+      Slither.parseIo(@io, :test).should eq(expected)
+    end
+    
   end
   
   describe "when parsing by bytes" do

@@ -53,7 +53,7 @@ class Slither
     end
     
     def parse(line)
-      line_data = line.unpack(unpacker)
+      line_data = divide( line, @columns.map(&:length) )
       row = {}
       @columns.each_with_index do |c, i|
         row[c.name] = c.parse(line_data[i]) unless RESERVED_NAMES.include?(c.name)
@@ -62,7 +62,7 @@ class Slither
     end
     
     def parse_when_problem(line)
-      line_data = line.unpack(@columns.map { |c| "a#{c.length}" }.join(''))
+      line_data = divide( line, @columns.map(&:length) )
       row = ''
       @columns.each_with_index do |c, i|
         row << "\n'#{c.name}':'#{line_data[i]}'" unless RESERVED_NAMES.include?(c.name)
@@ -82,6 +82,19 @@ class Slither
       
       def unpacker
         @columns.map { |c| c.unpacker }.join('')
+      end
+
+      def divide(string, sections)
+        result = []
+        str = string.dup
+        unless @definition.options[:force_character_offset]
+          result = str.unpack(unpacker)
+        else
+          sections.each do |s|
+            result << str.slice!(0..(s-1))
+          end
+        end
+        result
       end
 
   end  

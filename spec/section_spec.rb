@@ -120,6 +120,8 @@ describe Slither::Section do
     before(:each) do
       @line = '   45      Ryan      WoodSC '
       @section = Slither::Section.new(:body)
+      definition = Slither::Definition.new()
+      @section.definition = definition
       @column_content = { :id => 5, :first => 10, :last => 10, :state => 2 }      
     end
     
