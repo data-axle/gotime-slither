@@ -47,12 +47,14 @@ A simple, clean DSL for describing, writing, and parsing fixed-width text files.
     end
   end
   
-Supported types are: string, integer, date, float, money, and money_with_implied_decimal.
+Supported types are: string, integer, date, float, binary, money, and money_with_implied_decimal.
 
 Use :by_bytes => true (default) to allow newlines within rows and specify length in bytes.
 Use :by_bytes => false to support sections of different lengths and length specification
 in number of characters.
-  
+
+Binary types will be returned as an array of 8-bit unsigned byte values
+
 Then either feed it a nested struct with data values to create the file in the defined format:
 
   test_data = {

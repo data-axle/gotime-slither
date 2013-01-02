@@ -20,7 +20,21 @@ class Slither
     end
 
     def unpacker
-      "A#{@length}"
+      case @type
+        when :binary
+          "C#{@length}"
+        else
+          "A#{@length}"
+      end
+    end
+
+    def parse_length
+      case @type
+        when :binary
+          @length
+        else
+          1
+      end
     end
 
     def parse(value)
@@ -31,6 +45,8 @@ class Slither
           value.to_f
         when :money_with_implied_decimal
           value.to_f / 100
+        when :binary
+          value
         when :date
           if @options[:format]
             Date.strptime(value, @options[:format])

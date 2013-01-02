@@ -78,6 +78,11 @@ describe Slither::Column do
       @column.parse('00023.45').should == 23
     end
 
+    it "should accept a binary byte type" do
+      @column = Slither::Column.new(:dat, 1, :type=> :binary)
+      @column.parse(0x18).should == 0x18
+    end
+
     it "should support the float type" do
       @column = Slither::Column.new(:amount, 10, :type=> :float)
       @column.parse('  234.45').should == 234.45

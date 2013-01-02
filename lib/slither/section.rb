@@ -55,8 +55,13 @@ class Slither
     def parse(line)
       line_data = divide( line, @columns.map(&:length) )
       row = {}
-      @columns.each_with_index do |c, i|
-        row[c.name] = c.parse(line_data[i]) unless RESERVED_NAMES.include?(c.name)
+      i = 0
+      @columns.each do |c|
+        unless RESERVED_NAMES.include?(c.name)
+          row[c.name] = (c.parse_length == 1 ?
+              c.parse(line_data[i]) : c.parse(line_data[i, c.parse_length]))
+        end
+        i += c.parse_length
       end
       row
     end
