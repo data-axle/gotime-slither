@@ -35,8 +35,14 @@ describe Slither::Generator do
     lambda {  @generator.generate(@data) }.should raise_error(Slither::RequiredSectionEmptyError, "Required section 'header' was empty.")
   end
   
-  it "should generate a string" do
+  it "should generate a string with default newline options" do
     expected = "HEAD         1\n      Paul    Hewson\n      Dave     Evans\nFOOT         1"
     @generator.generate(@data).should == expected
   end 
+  
+  it "should generate a string with the specified newline options" do
+    @definition.options.merge!({:newline_style => :dos, :terminal_newline => true})
+    expected = "HEAD         1\r\n      Paul    Hewson\r\n      Dave     Evans\r\nFOOT         1\r\n"
+    @generator.generate(@data).should == expected
+  end
 end

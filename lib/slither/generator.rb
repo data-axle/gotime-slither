@@ -19,8 +19,19 @@ class Slither
   	      raise(Slither::RequiredSectionEmptyError, "Required section '#{section.name}' was empty.") unless section.optional
 	      end
 	    end
-	    @builder.join("\n")
+	    newline_style = newline_lookup(@definition.options[:newline_style])
+
+	    output_string = @builder.join(newline_style)
+	    output_string << newline_style if @definition.options[:terminal_newline]
+	    
+	    output_string
 		end
+		
+		private
+		
+		def newline_lookup(option)
+		  option == :dos ? "\r\n" : "\n"
+	  end
 		
 	end
 end
