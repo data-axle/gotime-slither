@@ -138,6 +138,12 @@ describe Slither::Section do
       parsed = @section.parse(@line)
       parsed.should have(4).keys
     end
+
+    it "should retain encoding of source" do
+      @column_content.each { |k,v| @section.column(k, v) }
+      parsed = @section.parse(@line)
+      parsed[:id].encoding.should eq(@line.encoding)
+    end
   end
   
   it "should try to match a line using the trap" do

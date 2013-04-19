@@ -94,6 +94,9 @@ class Slither
         str = string.dup
         unless @definition.options[:force_character_offset]
           result = str.unpack(unpacker)
+          result.each do |s|
+            s.force_encoding(string.encoding) if s.respond_to? :force_encoding
+          end
         else
           sections.each do |s|
             result << str.slice!(0..(s-1))
