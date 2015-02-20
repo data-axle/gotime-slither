@@ -9,7 +9,6 @@ class Slither
       @name = name
       @options = options
       @columns = []
-      @trap = options[:trap]
       @optional = options[:optional] || false
       @length = 0
     end
@@ -26,10 +25,6 @@ class Slither
     
     def spacer(length)
       column(:spacer, length)
-    end
-    
-    def trap(&block)
-      @trap = block
     end
     
     def template(name)
@@ -76,7 +71,7 @@ class Slither
     end
     
     def match(raw_line)
-      raw_line.nil? ? false : @trap.call(raw_line)
+      !raw_line.nil?
     end
     
     def method_missing(method, *args)

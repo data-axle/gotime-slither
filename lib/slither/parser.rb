@@ -10,13 +10,11 @@ class Slither
     
     def parse
       @file.each_line do |line|
-        line.chomp! if line
+        line.chomp!
         next if line.empty?
         @definition.sections.each do |section|
-          if section.match(line)
-            validate_length(line, section) if @definition.options[:validate_length]
-            yield section.parse(line)
-          end
+          validate_length(line, section) if @definition.options[:validate_length]
+          yield section.parse(line)
         end
       end
     end
@@ -37,9 +35,7 @@ class Slither
         record.force_encoding @file.external_encoding
         
         @definition.sections.each do |section|
-          if section.match(record)
-            yield section.parse(record)
-          end
+          yield section.parse(record)
         end
       end
     end

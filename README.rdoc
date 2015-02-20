@@ -26,14 +26,11 @@ A simple, clean DSL for describing, writing, and parsing fixed-width text files.
    
     # Create a header section
     d.header :align => :left do |header|      
-      # The trap tells Slither which lines should fall into this section
-      header.trap { |line| line[0,4] == 'HEAD' }
       # Use the boundary template for the columns
       header.template :boundary
     end
   
     d.body do |body|
-      body.trap { |line| line[0,4] =~ /[^(HEAD|FOOT)]/ }
       body.column :id, 10, :type => :integer
       body.column :name, 10, :align => :left
       body.spacer 3
@@ -41,7 +38,6 @@ A simple, clean DSL for describing, writing, and parsing fixed-width text files.
     end
         
     d.footer do |footer|
-      footer.trap { |line| line[0,4] == 'FOOT' }
       footer.template :boundary
       footer.column :record_count, 10
     end
