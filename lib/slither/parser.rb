@@ -8,29 +8,20 @@ class Slither
       @mode = :linear
     end
     
-    def parse(error_handler=nil)
-      parsed = {}
-
+    def parse
       @file.each_line do |line|
         line.chomp! if line
         next if line.empty?
         @definition.sections.each do |section|
           if section.match(line)
-            validate_length(line, section, error_handler) if @definition.options[:validate_length]
-            parsed = fill_content(line, section, parsed)
+            validate_length(line, section) if @definition.options[:validate_length]
+            yield section.parse(line)
           end
         end
       end
-
-      @definition.sections.each do |section|
-        raise(Slither::RequiredSectionNotFoundError, "Required section '#{section.name}' was not found.") unless parsed[section.name] || section.optional
-      end
-      parsed
     end
     
     def parse_by_bytes
-      parsed = {}
-      
       all_section_lengths = @definition.sections.map{|sec| sec.length }
       byte_length = all_section_lengths.max
       all_section_lengths.each { |bytes| raise(Slither::SectionsNotSameLengthError,
@@ -47,33 +38,18 @@ class Slither
         
         @definition.sections.each do |section|
           if section.match(record)
-            parsed = fill_content(record, section, parsed)
+            yield section.parse(record)
           end
         end
       end
-      
-      @definition.sections.each do |section|
-        raise(Slither::RequiredSectionNotFoundError, "Required section '#{section.name}' was not found.") unless parsed[section.name] || section.optional
-      end
-      parsed
     end
     
     private
-    
-      def fill_content(line, section, parsed)
-        parsed[section.name] ||= []
-        parsed[section.name] << section.parse(line)
-        parsed
-      end
       
-      def validate_length(line, section, error_handler)
+      def validate_length(line, section)
         if line.length != section.length
-          if error_handler
-            error_handler.call(line)
-          else
-            parsed_line = parse_for_error_message(line)
-            raise Slither::LineWrongSizeError, "Line wrong size: (#{line.length} when it should be #{section.length}. #{parsed_line})" 
-          end
+          parsed_line = parse_for_error_message(line)
+          raise Slither::LineWrongSizeError, "Line wrong size: (#{line.length} when it should be #{section.length}. #{parsed_line})" 
         end
       end
       
