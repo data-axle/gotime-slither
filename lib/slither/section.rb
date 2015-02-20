@@ -53,10 +53,9 @@ class Slither
       i = 0
       @columns.each do |c|
         unless RESERVED_NAMES.include?(c.name)
-          row[c.name] = (c.parse_length == 1 ?
-              c.parse(line_data[i]) : c.parse(line_data[i, c.parse_length]))
+          row[c.name] = c.parse(line_data[i])
         end
-        i += c.parse_length
+        i += 1
       end
       row
     end
@@ -81,7 +80,7 @@ class Slither
     private
       
       def unpacker
-        @columns.map { |c| c.unpacker }.join('')
+        @unpacker ||= @columns.map { |c| c.unpacker }.join('')
       end
 
       def divide(string, sections)

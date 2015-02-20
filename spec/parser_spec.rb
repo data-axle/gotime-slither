@@ -184,42 +184,6 @@ describe Slither::Parser do
     end
   end
 
-  describe 'when parsing binary data' do
-    before(:each) do
-      @definition = Slither.define :test do |d|
-        d.body do |b|
-          b.trap { true }
-          b.column :first, 3
-          b.column :dat, 2, type: :binary
-          b.column :last, 3
-        end
-      end
-
-      @io = StringIO.new
-      @parser = Slither::Parser.new(@definition, @io)
-    end
-
-    it 'should work basic case' do
-      @io.string = "abc\x00\x18end\n"
-
-      expected = {
-          :body => [ {:first => 'abc', :dat => [0x00, 0x18], :last => 'end'} ]
-      }
-
-      Slither.parse_io(@io, :test).should eq(expected)
-    end
-
-    it 'should handle spaces' do
-      @io.string = "abc \x18end\n"
-
-      expected = {
-          :body => [ {:first => 'abc', :dat => [0x20, 0x18], :last => 'end'} ]
-      }
-
-      Slither.parse_io(@io, :test).should eq(expected)
-    end
-  end
-
   describe 'when calling the helper method' do
     
     it 'remove_newlines returns true for file starting in newlines or EOF' do

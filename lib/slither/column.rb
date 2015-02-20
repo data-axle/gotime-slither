@@ -20,43 +20,11 @@ class Slither
     end
 
     def unpacker
-      case @type
-        when :binary
-          "C#{@length}"
-        else
-          "A#{@length}"
-      end
-    end
-
-    def parse_length
-      case @type
-        when :binary
-          @length
-        else
-          1
-      end
+      "A#{@length}"
     end
 
     def parse(value)
-      case @type
-        when :integer
-          value.to_i
-        when :float, :money
-          value.to_f
-        when :money_with_implied_decimal
-          value.to_f / 100
-        when :binary
-          value
-        when :date
-          if @options[:format]
-            Date.strptime(value, @options[:format])
-          else
-            Date.strptime(value)
-          end
-        else value.strip
-      end
-    rescue
-      raise ParserError, "Error parsing column ''#{name}'. The value '#{value}' could not be converted to type #{@type}: #{$!}"
+      value.strip
     end
 
     def format(value)

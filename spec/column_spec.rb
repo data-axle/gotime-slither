@@ -68,49 +68,6 @@ describe Slither::Column do
       @column.parse('000000234').should == '000000234'
       @column.parse('12.34').should == '12.34'
     end
-  
-    it "should support the integer type" do
-      @column = Slither::Column.new(:amount, 10, :type=> :integer)
-      @column.parse('234     ').should == 234
-      @column.parse('     234').should == 234
-      @column.parse('00000234').should == 234
-      @column.parse('Ryan    ').should == 0
-      @column.parse('00023.45').should == 23
-    end
-
-    it "should accept a binary byte type" do
-      @column = Slither::Column.new(:dat, 1, :type=> :binary)
-      @column.parse(0x18).should == 0x18
-    end
-
-    it "should support the float type" do
-      @column = Slither::Column.new(:amount, 10, :type=> :float)
-      @column.parse('  234.45').should == 234.45
-      @column.parse('234.5600').should == 234.56
-      @column.parse('     234').should == 234.0
-      @column.parse('00000234').should == 234.0
-      @column.parse('Ryan    ').should == 0
-      @column.parse('00023.45').should == 23.45
-    end
-    
-    it "should support the money_with_implied_decimal type" do
-      @column = Slither::Column.new(:amount, 10, :type=> :money_with_implied_decimal)
-      @column.parse('   23445').should == 234.45
-    end    
-
-    it "should support the date type" do
-      @column = Slither::Column.new(:date, 10, :type => :date)
-      dt = @column.parse('2009-08-22')
-      dt.should be_a(Date)
-      dt.to_s.should == '2009-08-22'
-    end   
-    
-    it "should use the format option with date type if available" do
-      @column = Slither::Column.new(:date, 10, :type => :date, :format => "%m%d%Y")
-      dt = @column.parse('08222009')
-      dt.should be_a(Date)
-      dt.to_s.should == '2009-08-22'
-    end   
   end
   
   describe "when applying formatting options" do
