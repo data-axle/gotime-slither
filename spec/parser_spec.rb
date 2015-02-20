@@ -107,7 +107,7 @@ describe Slither::Parser do
         :body => [ {:first => utf_str1, :last => utf_str2} ]
       }
       
-      Slither.parseIo(@io, :test).should eq(expected)
+      Slither.parse_io(@io, :test).should eq(expected)
     end
     
   end
@@ -153,7 +153,7 @@ describe Slither::Parser do
         :body => [ {:first => utf_str1, :last => utf_str2} ]
       }
       
-      Slither.parseIo(@io, :test).should eq(expected)
+      Slither.parse_io(@io, :test).should eq(expected)
     end
     
     it 'should handle mid-line newline chars' do
@@ -165,7 +165,7 @@ describe Slither::Parser do
         :body => [ {:first => str1, :last => str2}, {:first => str1, :last => str2} ]
       }
       
-      Slither.parseIo(@io, :test).should eq(expected)
+      Slither.parse_io(@io, :test).should eq(expected)
     end
     
     it 'should throw exception if section lengths are different' do
@@ -206,7 +206,7 @@ describe Slither::Parser do
           :body => [ {:first => 'abc', :dat => [0x00, 0x18], :last => 'end'} ]
       }
 
-      Slither.parseIo(@io, :test).should eq(expected)
+      Slither.parse_io(@io, :test).should eq(expected)
     end
 
     it 'should handle spaces' do
@@ -216,7 +216,7 @@ describe Slither::Parser do
           :body => [ {:first => 'abc', :dat => [0x20, 0x18], :last => 'end'} ]
       }
 
-      Slither.parseIo(@io, :test).should eq(expected)
+      Slither.parse_io(@io, :test).should eq(expected)
     end
   end
 

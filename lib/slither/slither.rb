@@ -35,10 +35,10 @@ class Slither
     raise ArgumentError, "File #{filename} does not exist." unless File.exists?(filename)
 
     file_io = File.open(filename, 'r')
-    parseIo(file_io, definition_name)
+    parse_io(file_io, definition_name)
   end
 
-  def self.parseIo(io, definition_name)
+  def self.parse_io(io, definition_name)
     definition = definition(definition_name)
     raise ArgumentError, "Definition name '#{definition_name}' was not found." unless definition
     parser = Parser.new(definition, io)
