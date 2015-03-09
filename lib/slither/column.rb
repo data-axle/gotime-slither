@@ -59,7 +59,7 @@ class Slither
       def inspect
         "#<#{self.class} #{instance_variables.map{|iv| "#{iv}=>#{instance_variable_get(iv)}"}.join(', ')}>"
       end
-      
+
       def to_s(value)
         result = case @type
           when :date
