@@ -34,7 +34,7 @@ describe Slither::Parser do
         ],
         :footer => [ {:type => "FOOT", :file_id => "1" }]
       }
-      result = @parser.parse
+      result = @parser.parse {}
       result.should == expected
     end
 
@@ -50,7 +50,7 @@ describe Slither::Parser do
     it "should raise an error if a required section is not found" do
       @io.string = '      Ryan      Wood'
 
-      lambda { @parser.parse }.should raise_error(Slither::RequiredSectionNotFoundError, "Required section 'header' was not found.")
+      lambda { @parser.parse {} }.should raise_error(Slither::RequiredSectionNotFoundError, "Required section 'header' was not found.")
     end
 
     it "should raise an error if the line is too long" do
@@ -58,7 +58,7 @@ describe Slither::Parser do
       @definition.sections[2].optional = true
       @io.string = 'abc'*20
 
-      lambda { @parser.parse }.should raise_error(Slither::LineWrongSizeError)
+      lambda { @parser.parse {} }.should raise_error(Slither::LineWrongSizeError)
     end
 
     it "should raise an error if the line is too short" do
@@ -66,7 +66,7 @@ describe Slither::Parser do
       @definition.sections[2].optional = true
       @io.string = 'abc'
 
-      lambda { @parser.parse }.should raise_error(Slither::LineWrongSizeError)
+      lambda { @parser.parse {} }.should raise_error(Slither::LineWrongSizeError)
     end
 
     it "shouldn't raise an error if validate is turned off and too short" do
@@ -75,9 +75,14 @@ describe Slither::Parser do
       @definition.sections[2].optional = true
       @io.string = "abcdefghijk\nabc"
 
-      expected = { :body => [ {:first => "abcdefghij", :last => "k" },
-        {:first => "abc", :last => "" } ] }
-      @parser.parse.should == expected
+      expected = [
+        {:first => "abcdefghij", :last => "k" },
+        {:first => "abc", :last => "" },
+      ]
+
+      actual = []
+      @parser.parse { |line| actual << line }
+      actual.should == expected
     end
 
     it "shouldn't raise an error if validate is turned off and too long" do
@@ -86,8 +91,10 @@ describe Slither::Parser do
       @definition.sections[2].optional = true
       @io.string = 'abcdefghijklmnopqrstuvwxyz'
 
-      expected = { :body => [ {:first => "abcdefghij", :last => "klmnopqrst" } ] }
-      @parser.parse.should == expected
+      expected = [ {:first => "abcdefghij", :last => "klmnopqrst" } ]
+      actual = []
+      @parser.parse { |line| actual << line }
+      actual.should == expected
     end
 
     it 'should handle utf characters with force_character_offset = true' do
@@ -100,11 +107,11 @@ describe Slither::Parser do
 
       (utf_str1 + utf_str2).size.should eq(20)
 
-      expected = {
-        :body => [ {:first => utf_str1, :last => utf_str2} ]
-      }
+      expected = [ {:first => utf_str1, :last => utf_str2} ]
 
-      Slither.parse_io(@io, :test).should eq(expected)
+      actual = []
+      Slither.parse_io(@io, :test) { |line| actual << line }
+      actual.should eq(expected)
     end
 
   end
@@ -125,19 +132,19 @@ describe Slither::Parser do
     it 'should raise error for data with line length too long' do
       @io.string = "abcdefghijklmnop"
 
-      lambda { @parser.parse_by_bytes }.should raise_error(Slither::LineWrongSizeError)
+      lambda { @parser.parse_by_bytes {} }.should raise_error(Slither::LineWrongSizeError)
     end
 
     it 'should raise error for data with line length too short' do
       @io.string = "abc"
 
-      lambda { @parser.parse_by_bytes }.should raise_error(Slither::LineWrongSizeError)
+      lambda { @parser.parse_by_bytes {} }.should raise_error(Slither::LineWrongSizeError)
     end
 
     it 'should raise error for data with empty lines' do
       @io.string = "abcdefghij\r\n\n\n\n"  # 10 then 3
 
-      lambda { @parser.parse_by_bytes }.should raise_error(Slither::LineWrongSizeError)
+      lambda { @parser.parse_by_bytes {} }.should raise_error(Slither::LineWrongSizeError)
     end
 
     it 'should handle utf characters' do
@@ -145,11 +152,11 @@ describe Slither::Parser do
       utf_str2 = "ab\xE5\x9B\xBD"
       @io.string = (utf_str1 + utf_str2)
 
-      expected = {
-        :body => [ {:first => utf_str1, :last => utf_str2} ]
-      }
+      expected = [ {:first => utf_str1, :last => utf_str2} ]
 
-      Slither.parse_io(@io, :test).should eq(expected)
+      actual = []
+      Slither.parse_io(@io, :test) { |line| actual << line }
+      actual.should eq(expected)
     end
 
     it 'should handle mid-line newline chars' do
@@ -157,11 +164,14 @@ describe Slither::Parser do
       str2 = "a\n\r\nb"
       @io.string = (str1 + str2 + "\n" + str1 + str2)
 
-      expected = {
-        :body => [ {:first => str1, :last => str2}, {:first => str1, :last => str2} ]
-      }
+      expected = [
+        {:first => str1, :last => str2},
+        {:first => str1, :last => str2},
+      ]
 
-      Slither.parse_io(@io, :test).should eq(expected)
+      actual = []
+      Slither.parse_io(@io, :test) { |line| actual << line }
+      actual.should eq(expected)
     end
 
     it 'should throw exception if section lengths are different' do
@@ -231,26 +241,6 @@ describe Slither::Parser do
       @parser.send(:newline?,nil).should eq(false)
       @parser.send(:newline?,"").should eq(false)
     end
-  end
-
-  describe "when using error handler" do
-
-    it "calls the error_handler lambda" do
-      error_handler = lambda {|line| raise "error handler exception for #{line}"}
-
-      @definition = Slither.define :test, error_handler: error_handler do |d|
-        d.body do |b|
-          b.column :first, 5
-          b.column :last, 5
-        end
-      end
-
-      @io = StringIO.new 'abc'
-      @parser = Slither::Parser.new(@definition, @io)
-
-      lambda { @parser.parse(error_handler) }.should raise_error(RuntimeError, "error handler exception for abc")
-    end
-
   end
 
 end
