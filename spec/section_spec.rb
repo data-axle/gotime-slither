@@ -55,13 +55,6 @@ describe Slither::Section do
     end
   end
 
-  it "should accept and store the trap as a block" do
-    @section.trap { |v| v == 4 }
-    trap = @section.instance_variable_get(:@trap)
-    trap.should be_a(Proc)
-    trap.call(4).should == true
-  end
-
   describe "when adding a template" do
     before(:each) do
       @template = mock('templated section', :columns => [1,2,3], :options => {})
@@ -144,13 +137,5 @@ describe Slither::Section do
       parsed = @section.parse(@line)
       parsed[:id].encoding.should eq(@line.encoding)
     end
-  end
-
-  it "should try to match a line using the trap" do
-    @section.trap do |line|
-      line == 'hello'
-    end
-    @section.match('hello').should be_true
-    @section.match('goodbye').should be_false
   end
 end

@@ -6,17 +6,14 @@ describe Slither::Parser do
     before(:each) do
       @definition = Slither.define :test, :by_bytes => false do |d|
         d.header do |h|
-          h.trap { |line| line[0,4] == 'HEAD' }
           h.column :type, 4
           h.column :file_id, 10
         end
         d.body do |b|
-          b.trap { |line| line[0,4] != 'HEAD' &&  line[0,4] != 'FOOT'}
           b.column :first, 10
           b.column :last, 10
         end
         d.footer do |f|
-          f.trap { |line| line[0,4] == 'FOOT' }
           f.column :type, 4
           f.column :file_id, 10
         end
@@ -116,7 +113,6 @@ describe Slither::Parser do
     before(:each) do
       @definition = Slither.define :test do |d|
         d.body do |b|
-          b.trap { true }
           b.column :first, 5
           b.column :last, 5
         end
@@ -244,7 +240,6 @@ describe Slither::Parser do
 
       @definition = Slither.define :test, error_handler: error_handler do |d|
         d.body do |b|
-          b.trap { true }
           b.column :first, 5
           b.column :last, 5
         end
