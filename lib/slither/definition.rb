@@ -42,6 +42,17 @@ class Slither
       row
     end
 
+    def format(data)
+      # raise( ColumnMismatchError,
+      #   "The '#{@name}' section has #{@columns.size} column(s) defined, but there are #{data.size} column(s) provided in the data."
+      # ) unless @columns.size == data.size
+      row = ''
+      @columns.each do |column|
+        row += column.format(data[column.name])
+      end
+      row
+    end
+
     private
 
     # TODO: can we use slice instead?
