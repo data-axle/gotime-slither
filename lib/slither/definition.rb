@@ -63,6 +63,7 @@ class Slither
     def divide(string)
       result = string.unpack(unpacker)
       result.each do |s|
+        s.strip!
         s.force_encoding(string.encoding) if s.respond_to? :force_encoding
       end
       result
