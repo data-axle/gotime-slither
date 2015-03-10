@@ -71,8 +71,10 @@ class Slither
 
     # TODO: investigate if this solution can work / is faster
     # def divide(string)
+    #   offset = 0
     #   @columns.map do |column|
-    #     value = string.slice!(0, column.length)
+    #     value = string[offset, column.length]
+    #     offset += column.length
     #     value.strip!
     #     value
     #   end
