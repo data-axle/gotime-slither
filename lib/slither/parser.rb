@@ -33,23 +33,23 @@ class Slither
 
     private
 
-      def validate_length(line, definition)
-        if line.length != definition.length
-          parsed_line = parse_for_error_message(line)
-          raise Slither::LineWrongSizeError, "Line wrong size: (#{line.length} when it should be #{definition.length}. #{parsed_line})"
-        end
-      end
+      # def validate_length(line, definition)
+      #   if line.length != definition.length
+      #     parsed_line = parse_for_error_message(line)
+      #     raise Slither::LineWrongSizeError, "Line wrong size: (#{line.length} when it should be #{definition.length}. #{parsed_line})"
+      #   end
+      # end
 
-      def remove_newlines!
-        return true if @file.eof?
-        b = @file.getbyte
-        if b == 10 || b == 13 && @file.getbyte == 10
-          return true
-        else
-          @file.ungetbyte b
-          return false
-        end
-      end
+      # def remove_newlines!
+      #   return true if @file.eof?
+      #   b = @file.getbyte
+      #   if b == 10 || b == 13 && @file.getbyte == 10
+      #     return true
+      #   else
+      #     @file.ungetbyte b
+      #     return false
+      #   end
+      # end
 
       # def newline?(char_code)
       #   # \n or LF -> 10

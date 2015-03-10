@@ -14,25 +14,18 @@ class Slither
     end
 
     def format(value)
-      formatter % value
+      truncate(formatter % value)
     end
 
     private
 
-    def validate_size(result)
-      # Handle when length is out of range
-      if result.length > @length
-        raise Slither::FormattedStringExceedsLengthError,
-          "The formatted value '#{result}' in column '#{@name}' exceeds the allowed length of #{@length} chararacters."
-      end
-      result
+    def truncate(result)
+      result.length > @length ? result[0, @length] : result
     end
 
-    private
-
-      def formatter
-        "%#{@length}s"
-      end
+    def formatter
+      "%-#{@length}s"
+    end
 
   end
 end
