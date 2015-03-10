@@ -11,7 +11,7 @@ class Slither
     end
 
     def unpacker
-      "A#{@length}"
+      @unpacker ||= "A#{@length}"
     end
 
     def format(value)
@@ -34,7 +34,7 @@ class Slither
     end
 
     def formatter
-      "%-#{@length}s"
+      @formatter ||= "%-#{@length}s"
     end
 
   end
