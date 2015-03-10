@@ -18,7 +18,7 @@ class Slither
       raise(Slither::DuplicateColumnNameError, "You have already defined a column named '#{name}'.") if @columns.map do |c|
         c.name
       end.flatten.include?(name)
-      col = Column.new(name, length)
+      col = Column.new(name, length, options)
       @columns << col
       @length += length
       col
