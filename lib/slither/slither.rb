@@ -12,7 +12,7 @@ class Slither
 
 
   def self.define(name, options = {}, &block)
-    definition = Definition.new(options)
+    definition = Definition.new(name, options)
     yield(definition)
     definitions[name] = definition
     definition

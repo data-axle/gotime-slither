@@ -1,35 +1,73 @@
 class Slither
   class Definition
-    attr_reader :sections, :templates, :options
+    attr_reader :name, :columns, :options, :length
 
-    def initialize(options = {})
-      @sections = []
-      @templates = {}
-      @options = { :align => :right, :by_bytes => true, :validate_length => true,
-        :error_handler => nil, force_character_offset: false, :newline_style => :unix,
-        :terminal_newline => false }.merge(options)
+    DEFAULT_OPTIONS = {
+      by_bytes: true,
+      newline_style: :unix,
+      terminal_newline: false
+    }
+    def initialize(name, options = {})
+      @name = name
+      @options = DEFAULT_OPTIONS.merge(options)
+      @columns = []
+      @length = 0
     end
 
-    def section(name, options = {}, &block)
-      raise( ArgumentError, "Reserved or duplicate section name: '#{name}'") if
-        Section::RESERVED_NAMES.include?( name ) ||
-        (@sections.size > 0 && @sections.map{ |s| s.name }.include?( name ))
-
-      section = Slither::Section.new(name, @options.merge(options))
-      section.definition = self
-      yield(section)
-      @sections << section
-      section
+    def column(name, length, options = {})
+      raise(Slither::DuplicateColumnNameError, "You have already defined a column named '#{name}'.") if @columns.map do |c|
+        c.name
+      end.flatten.include?(name)
+      col = Column.new(name, length, options)
+      @columns << col
+      @length += length
+      col
     end
 
-    def template(name, options = {}, &block)
-      section = Slither::Section.new(name, @options.merge(options))
-      yield(section)
-      @templates[name] = section
+    def parse(line)
+      line_data = divide line
+      row = {}
+      @columns.each_with_index do |column, index|
+        row[column.name] = line_data[index]
+      end
+      row
     end
 
-    def method_missing(method, *args, &block)
-      section(method, *args, &block)
+    def parse_when_problem(line)
+      line_data = divide line
+      row = ''
+      @columns.each_with_index do |column, index|
+        row << "\n'#{column.name}':'#{line_data[index]}'"
+      end
+      row
     end
+
+    def format(data)
+      # raise( ColumnMismatchError,
+      #   "The '#{@name}' section has #{@columns.size} column(s) defined, but there are #{data.size} column(s) provided in the data."
+      # ) unless @columns.size == data.size
+      row = ''
+      @columns.each do |column|
+        row += column.format(data[column.name])
+      end
+      row
+    end
+
+    private
+
+    # TODO: can we use slice instead?
+    def unpacker
+      @unpacker ||= @columns.map { |c| c.unpacker }.join('')
+    end
+
+    def divide(string)
+      result = string.unpack(unpacker)
+      result.each do |s|
+        s.strip!
+        s.force_encoding(string.encoding) if s.respond_to? :force_encoding
+      end
+      result
+    end
+
   end
 end
