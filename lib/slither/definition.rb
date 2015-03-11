@@ -55,29 +55,14 @@ class Slither
 
     private
 
-    # TODO: can we use slice instead?
-    def unpacker
-      @unpacker ||= @columns.map { |c| c.unpacker }.join('')
-    end
-
     def divide(string)
-      result = string.unpack(unpacker)
-      result.each do |s|
-        s.strip!
-        s.force_encoding(string.encoding) if s.respond_to? :force_encoding
+      offset = 0
+      @columns.map do |column|
+        value = string[offset, column.length]
+        offset += column.length
+        value.strip!
+        value
       end
-      result
     end
-
-    # TODO: investigate if this solution can work / is faster
-    # def divide(string)
-    #   offset = 0
-    #   @columns.map do |column|
-    #     value = string[offset, column.length]
-    #     offset += column.length
-    #     value.strip!
-    #     value
-    #   end
-    # end
   end
 end
