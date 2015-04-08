@@ -25,7 +25,7 @@ class Slither
           raise(Slither::LineWrongSizeError, "Line wrong size: No newline at #{byte_length} bytes. #{parsed_line}")
         end
 
-        record.force_encoding @file.external_encoding
+        record.force_encoding(@file.external_encoding) if @file.respond_to?(:external_encoding)
 
         yield @definition.parse(record)
       end
@@ -52,7 +52,7 @@ class Slither
       end
 
       def parse_for_error_message(line)
-        line.force_encoding @file.external_encoding
+        line.force_encoding(@file.external_encoding) if @file.respond_to?(:external_encoding)
         @definition.parse_when_problem(line)
       end
 
