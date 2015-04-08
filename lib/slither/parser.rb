@@ -25,13 +25,19 @@ class Slither
           raise(Slither::LineWrongSizeError, "Line wrong size: No newline at #{byte_length} bytes. #{parsed_line}")
         end
 
-        record.force_encoding(@file.external_encoding) if @file.respond_to?(:external_encoding)
+        record.force_encoding(encoding_from_source) if encoding_from_source
 
         yield @definition.parse(record)
       end
     end
 
     private
+
+      def encoding_from_source
+        @encoding ||= @file.external_encoding if @file.respond_to?(:external_encoding)
+        @encoding ||= @file.to_io.external_encoding if @file.respond_to?(:to_io)
+        @encoding
+      end
 
       def validate_length(line, definition)
         if line.length != definition.length
@@ -52,7 +58,7 @@ class Slither
       end
 
       def parse_for_error_message(line)
-        line.force_encoding(@file.external_encoding) if @file.respond_to?(:external_encoding)
+        line.force_encoding(encoding_from_source) if encoding_from_source
         @definition.parse_when_problem(line)
       end
 
